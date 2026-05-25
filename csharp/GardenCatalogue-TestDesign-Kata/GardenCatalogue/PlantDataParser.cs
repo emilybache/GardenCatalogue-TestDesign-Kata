@@ -1,0 +1,110 @@
+using System.Text;
+
+namespace GardenCatalogue;
+
+public class PlantDataParser
+{
+    public const int NameLength = 32;
+
+    private static readonly char[] TrimChars = " ,.-_\r\t\n\0".ToCharArray();
+
+    public IEnumerable<Plant> Parse(Stream stream)
+    {
+        if (stream.Length == 0) return new List<Plant>();
+
+        int version = DetectVersion(stream);
+
+        return version switch
+        {
+            2 => ParseV2(stream),
+            _ => ParseV1(stream)
+        };
+    }
+
+    private int DetectVersion(Stream stream)
+    {
+        if (stream.Length < 4) return 1;
+
+        long originalPosition = stream.Position;
+        using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+        byte[] marker = reader.ReadBytes(4);
+
+        if (marker.Length == 4 && marker[0] == (byte)'P' && marker[1] == (byte)'L' && marker[2] == (byte)'N' && marker[3] == (byte)'T')
+        {
+            return 2;
+        }
+
+        stream.Position = originalPosition;
+        return 1;
+    }
+
+    private IEnumerable<Plant> ParseV1(Stream stream)
+    {
+        var plants = new List<Plant>();
+        using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+
+        while (stream.Position < stream.Length)
+        {
+            if (stream.Position + 56 > stream.Length) break;
+
+            var plant = ReadCommonHeader(reader);
+            plants.Add(plant);
+        }
+
+        return plants;
+    }
+
+    private IEnumerable<Plant> ParseV2(Stream stream)
+    {
+        var plants = new List<Plant>();
+        using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+
+        while (stream.Position < stream.Length)
+        {
+            if (stream.Position + 56 > stream.Length) break;
+
+            var plant = ReadCommonHeader(reader);
+
+            // Read extended fields for V2
+            string latinName = reader.ReadString();
+            string articleNumber = reader.ReadString();
+            var properties = new Dictionary<string, string>();
+            int propCount = reader.ReadInt32();
+            for (int i = 0; i < propCount; i++)
+            {
+                string key = reader.ReadString();
+                string value = reader.ReadString();
+                properties[key] = value;
+            }
+
+            plants.Add(new Plant(plant.Name, latinName, articleNumber, plant.Type, plant.BloomPeriod, plant.MaxHeight, plant.Soil, plant.Light, properties));
+        }
+
+        return plants;
+    }
+
+    private Plant ReadCommonHeader(BinaryReader reader)
+    {
+        byte[] headerBytes = reader.ReadBytes(56);
+        using var headerStream = new MemoryStream(headerBytes);
+        using var headerReader = new BinaryReader(headerStream, Encoding.UTF8);
+
+        string name = Encoding.UTF8.GetString(headerReader.ReadBytes(NameLength)).Trim(TrimChars);
+        PlantType type = (PlantType)headerReader.ReadInt32();
+        double maxHeight = headerReader.ReadDouble();
+        SoilCondition soil = (SoilCondition)headerReader.ReadInt32();
+        LightCondition light = (LightCondition)headerReader.ReadInt32();
+        int bloomMask = headerReader.ReadInt32();
+
+        var months = new List<Month>();
+        for (int i = 0; i < 12; i++)
+        {
+            if ((bloomMask & (1 << i)) != 0)
+            {
+                months.Add((Month)(i + 1));
+            }
+        }
+
+        return new Plant(name, string.Empty, string.Empty, type, new BloomPeriod(months.ToArray()), maxHeight, soil, light, new Dictionary<string, string>());
+    }
+}
