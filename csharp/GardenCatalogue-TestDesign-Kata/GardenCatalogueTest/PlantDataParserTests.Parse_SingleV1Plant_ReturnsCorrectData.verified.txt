@@ -1,11 +1,17 @@
-﻿[
-  {
-    Name: Test Bush,
-    LatinName: ,
-    ArticleNumber: ,
-    Type: Bush,
-    BloomPeriod: {},
-    MaxHeight: 1.0,
-    Soil: Any
-  }
-]
+﻿=== INPUT DATA ===
+--- Item 1 ---
+Name: Test Bush
+Type: Bush
+Max Height: 1.0m
+Soil: Any
+Light: FullSun
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Test Bush
+Type: Bush
+Max Height: 1.0m
+Soil: Any
+Light: FullSun

@@ -1,15 +1,19 @@
-﻿[
-  {
-    Name: Lavender,
-    LatinName: Lavandula angustifolia,
-    ArticleNumber: FLO-001,
-    BloomPeriod: {
-      Months: [
-        June,
-        July,
-        August
-      ]
-    },
-    MaxHeight: 0.6
-  }
-]
+﻿{
+  Month: June,
+  MaxHeight: 2.0,
+  Result: [
+    {
+      Name: Lavender,
+      LatinName: Lavandula angustifolia,
+      ArticleNumber: FLO-001,
+      BloomPeriod: {
+        Months: [
+          June,
+          July,
+          August
+        ]
+      },
+      MaxHeight: 0.6
+    }
+  ]
+}

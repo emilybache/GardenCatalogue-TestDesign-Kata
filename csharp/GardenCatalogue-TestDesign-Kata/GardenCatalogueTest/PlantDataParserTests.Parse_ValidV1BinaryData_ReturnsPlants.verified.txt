@@ -1,29 +1,31 @@
-﻿[
-  {
-    Name: Flower1,
-    LatinName: ,
-    ArticleNumber: ,
-    BloomPeriod: {
-      Months: [
-        May,
-        June,
-        July
-      ]
-    },
-    MaxHeight: 0.5
-  },
-  {
-    Name: Bush1,
-    LatinName: ,
-    ArticleNumber: ,
-    Type: Bush,
-    BloomPeriod: {
-      Months: [
-        August
-      ]
-    },
-    MaxHeight: 2.0,
-    Soil: Clay,
-    Light: PartialShade
-  }
-]
+﻿=== INPUT DATA ===
+--- Item 1 ---
+Name: Flower1
+Blooms: May, June, July
+Max Height: 0.5m
+Soil: Sandy
+Light: FullSun
+--- Item 2 ---
+Name: Bush1
+Type: Bush
+Blooms: August
+Max Height: 2.0m
+Soil: Clay
+Light: PartialShade
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Flower1
+Blooms: May, June, July
+Max Height: 0.5m
+Soil: Sandy
+Light: FullSun
+--- Plant 2 ---
+Name: Bush1
+Type: Bush
+Blooms: August
+Max Height: 2.0m
+Soil: Clay
+Light: PartialShade

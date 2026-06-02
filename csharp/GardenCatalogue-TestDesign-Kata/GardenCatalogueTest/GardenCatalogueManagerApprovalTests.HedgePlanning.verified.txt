@@ -1,42 +1,45 @@
-﻿[
-  {
-    Name: Beech,
-    LatinName: Fagus sylvatica,
-    ArticleNumber: TRE-001,
-    Type: Tree,
-    BloomPeriod: {
-      Months: [
-        May
-      ]
+﻿{
+  MinHeight: 2.0,
+  Result: [
+    {
+      Name: Beech,
+      LatinName: Fagus sylvatica,
+      ArticleNumber: TRE-001,
+      Type: Tree,
+      BloomPeriod: {
+        Months: [
+          May
+        ]
+      },
+      MaxHeight: 5.0,
+      Soil: Any
     },
-    MaxHeight: 5.0,
-    Soil: Any
-  },
-  {
-    Name: Yew,
-    LatinName: Taxus baccata,
-    ArticleNumber: TRE-002,
-    Type: Tree,
-    BloomPeriod: {},
-    MaxHeight: 4.0,
-    Soil: Any,
-    Light: PartialShade
-  },
-  {
-    Name: Oak,
-    LatinName: Quercus robur,
-    ArticleNumber: TRE-003,
-    Type: Tree,
-    BloomPeriod: {},
-    MaxHeight: 20.0,
-    Soil: Any
-  },
-  {
-    Name: Silver Birch,
-    LatinName: Betula pendula,
-    ArticleNumber: TRE-004,
-    Type: Tree,
-    BloomPeriod: {},
-    MaxHeight: 15.0
-  }
-]
+    {
+      Name: Yew,
+      LatinName: Taxus baccata,
+      ArticleNumber: TRE-002,
+      Type: Tree,
+      BloomPeriod: {},
+      MaxHeight: 4.0,
+      Soil: Any,
+      Light: PartialShade
+    },
+    {
+      Name: Oak,
+      LatinName: Quercus robur,
+      ArticleNumber: TRE-003,
+      Type: Tree,
+      BloomPeriod: {},
+      MaxHeight: 20.0,
+      Soil: Any
+    },
+    {
+      Name: Silver Birch,
+      LatinName: Betula pendula,
+      ArticleNumber: TRE-004,
+      Type: Tree,
+      BloomPeriod: {},
+      MaxHeight: 15.0
+    }
+  ]
+}

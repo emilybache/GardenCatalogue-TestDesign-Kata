@@ -10,12 +10,14 @@ namespace GardenCatalogueTest;
 public class PlantDataParserTests
 {
     private PlantDataParser _dataParser;
+    private PlantPrinter _plantPrinter;
 
     [SetUp]
     public void SetUp()
     {
         BugConfigurations.Reset();
         _dataParser = new PlantDataParser();
+        _plantPrinter = new PlantPrinter();
     }
 
     [Test]
@@ -23,7 +25,7 @@ public class PlantDataParserTests
     {
         using var stream = new MemoryStream();
         var result = _dataParser.Parse(stream);
-        return Verify(result);
+        return Verify(ToApprovedString("Empty Stream", 2, result));
     }
 
     [Test]
@@ -39,7 +41,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(result);
+        return Verify(ToApprovedString(plants, 2, result));
     }
 
     [Test]
@@ -56,7 +58,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(result);
+        return Verify(ToApprovedString(plants, 2, result));
     }
 
     [Test]
@@ -85,9 +87,48 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(result);
+        return Verify(ToApprovedString(plants, 2, result));
     }
-    
+
+    private string ToApprovedString(object input, int version, IEnumerable<Plant> result)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("=== INPUT DATA ===");
+        if (input is string s)
+        {
+            sb.AppendLine(s);
+        }
+        else if (input is IEnumerable<Plant> plants)
+        {
+            var list = plants.ToList();
+            for (int i = 0; i < list.Count; i++)
+            {
+                sb.AppendLine($"--- Item {i + 1} ---");
+                _plantPrinter.Print(sb, list[i]);
+            }
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"--- Parser Version {version} ---");
+        sb.AppendLine();
+
+        var resultList = result.ToList();
+        sb.AppendLine("=== OUTPUT PLANTS ===");
+        if (resultList.Count == 0)
+        {
+            sb.AppendLine("(None)");
+        }
+        else
+        {
+            for (int i = 0; i < resultList.Count; i++)
+            {
+                sb.AppendLine($"--- Plant {i + 1} ---");
+                _plantPrinter.Print(sb, resultList[i]);
+            }
+        }
+
+        return sb.ToString();
+    }
 
     private static byte[] CreateBinaryData(IEnumerable<Plant> plants, int version = 2)
     {

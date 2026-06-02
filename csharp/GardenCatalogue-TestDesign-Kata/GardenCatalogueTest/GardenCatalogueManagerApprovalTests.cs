@@ -17,21 +17,38 @@ public class GardenCatalogueManagerApprovalTests
     [Test]
     public async Task HedgePlanning()
     {
-        var hedge = _manager.PlanHedge(2.0);
-        await Verifier.Verify(hedge);
+        var minHeight = 2.0;
+        var hedge = _manager.PlanHedge(minHeight);
+        await Verifier.Verify(new
+        {
+            MinHeight = minHeight,
+            Result = hedge
+        });
     }
 
     [Test]
     public async Task ConditionFiltering()
     {
-        var plants = _manager.GetPlantsForCondition(SoilCondition.Sandy, LightCondition.FullSun);
-        await Verifier.Verify(plants);
+        var soil = SoilCondition.Sandy;
+        var light = LightCondition.FullSun;
+        var plants = _manager.GetPlantsForCondition(soil, light);
+        await Verifier.Verify(new
+        {
+            Result = plants
+        });
     }
 
     [Test]
     public async Task BedPlanning()
     {
-        var bedInJune = _manager.PlanBed(Month.June, 2.0);
-        await Verifier.Verify(bedInJune);
+        var month = Month.June;
+        var maxHeight = 2.0;
+        var bedInJune = _manager.PlanBed(month, maxHeight);
+        await Verifier.Verify(new
+        {
+            Month = month,
+            MaxHeight = maxHeight,
+            Result = bedInJune
+        });
     }
 }

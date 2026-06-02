@@ -1,27 +1,37 @@
-﻿[
-  {
-    Name: Lavender,
-    LatinName: Lavandula angustifolia,
-    ArticleNumber: FLO-001,
-    BloomPeriod: {
-      Months: [
-        June,
-        July,
-        August
-      ]
-    },
-    MaxHeight: 0.6,
-    Properties: {
-      Color: Purple,
-      Fragrance: High
-    }
-  },
-  {
-    Name: Minimal Plant,
-    LatinName: ,
-    ArticleNumber: ,
-    BloomPeriod: {},
-    MaxHeight: 1.0,
-    Soil: Any
-  }
-]
+﻿=== INPUT DATA ===
+--- Item 1 ---
+Name: Lavender
+Latin Name: Lavandula angustifolia
+Article #: FLO-001
+Blooms: June, July, August
+Max Height: 0.6m
+Soil: Sandy
+Light: FullSun
+Properties:
+  - Color: Purple
+  - Fragrance: High
+--- Item 2 ---
+Name: Minimal Plant
+Max Height: 1.0m
+Soil: Any
+Light: FullSun
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Lavender
+Latin Name: Lavandula angustifolia
+Article #: FLO-001
+Blooms: June, July, August
+Max Height: 0.6m
+Soil: Sandy
+Light: FullSun
+Properties:
+  - Color: Purple
+  - Fragrance: High
+--- Plant 2 ---
+Name: Minimal Plant
+Max Height: 1.0m
+Soil: Any
+Light: FullSun
