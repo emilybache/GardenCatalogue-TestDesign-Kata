@@ -31,6 +31,7 @@ public class PlantDataParser
 
         if (marker.Length == 4 && marker[0] == (byte)'P' && marker[1] == (byte)'L' && marker[2] == (byte)'N' && marker[3] == (byte)'T')
         {
+            if (BugConfigurations.Bug1) return 1;
             return 2;
         }
 
@@ -63,21 +64,53 @@ public class PlantDataParser
         {
             if (stream.Position + 56 > stream.Length) break;
 
-            var plant = ReadCommonHeader(reader);
+            var headerPlant = ReadCommonHeader(reader);
 
             // Read extended fields for V2
             string latinName = reader.ReadString();
             string articleNumber = reader.ReadString();
             var properties = new Dictionary<string, string>();
-            int propCount = reader.ReadInt32();
-            for (int i = 0; i < propCount; i++)
+            
+            if (!BugConfigurations.Bug4)
             {
-                string key = reader.ReadString();
-                string value = reader.ReadString();
-                properties[key] = value;
+                int propCount = reader.ReadInt32();
+                for (int i = 0; i < propCount; i++)
+                {
+                    string key = reader.ReadString();
+                    string value = reader.ReadString();
+                    properties[key] = value;
+                }
             }
 
-            plants.Add(new Plant(plant.Name, latinName, articleNumber, plant.Type, plant.BloomPeriod, plant.MaxHeight, plant.Soil, plant.Light, properties));
+            string name = headerPlant.Name;
+            string actualLatinName = latinName;
+            
+            // If Bug5 is enabled, we already swapped name and latinName in ReadCommonHeader.
+            // But ReadCommonHeader returns a Plant object where LatinName field contains what was originally in Name,
+            // and Name field contains string.Empty (since it was empty when swapped).
+            // Wait, this is getting confusing. 
+
+            if (BugConfigurations.Bug5)
+            {
+                // In ReadCommonHeader:
+                // name = ""
+                // latinName = "Lavender" (original name)
+                // return new Plant("", "Lavender", ...)
+                
+                // Here:
+                // headerPlant.Name is ""
+                // headerPlant.LatinName is "Lavender"
+                // latinName is "Lavandula angustifolia" (read from stream)
+                
+                // We want:
+                // final name = "Lavandula angustifolia"
+                // final latinName = "Lavender"
+                
+                name = latinName;
+                actualLatinName = headerPlant.LatinName;
+            }
+
+            plants.Add(new Plant(name, actualLatinName, articleNumber, headerPlant.Type, headerPlant.BloomPeriod, headerPlant.MaxHeight, headerPlant.Soil, headerPlant.Light, properties));
         }
 
         return plants;
@@ -89,11 +122,27 @@ public class PlantDataParser
         using var headerStream = new MemoryStream(headerBytes);
         using var headerReader = new BinaryReader(headerStream, Encoding.UTF8);
 
-        string name = Encoding.UTF8.GetString(headerReader.ReadBytes(NameLength)).Trim(TrimChars);
+        string name = Encoding.UTF8.GetString(headerReader.ReadBytes(NameLength));
+        if (BugConfigurations.Bug3)
+        {
+            name = name.Trim(); // Standard trim instead of specific TrimChars
+        }
+        else
+        {
+            name = name.Trim(TrimChars);
+        }
+
+        string latinName = string.Empty;
+        if (BugConfigurations.Bug5)
+        {
+            (name, latinName) = (latinName, name);
+        }
+
         PlantType type = (PlantType)headerReader.ReadInt32();
         double maxHeight = headerReader.ReadDouble();
         SoilCondition soil = (SoilCondition)headerReader.ReadInt32();
         LightCondition light = (LightCondition)headerReader.ReadInt32();
+
         int bloomMask = headerReader.ReadInt32();
 
         var months = new List<Month>();
@@ -101,10 +150,15 @@ public class PlantDataParser
         {
             if ((bloomMask & (1 << i)) != 0)
             {
-                months.Add((Month)(i + 1));
+                int monthValue = i + 1;
+                if (BugConfigurations.Bug2)
+                {
+                    monthValue = i; // 0-indexed bug
+                }
+                months.Add((Month)monthValue);
             }
         }
 
-        return new Plant(name, string.Empty, string.Empty, type, new BloomPeriod(months.ToArray()), maxHeight, soil, light, new Dictionary<string, string>());
+        return new Plant(name, latinName, string.Empty, type, new BloomPeriod(months.ToArray()), maxHeight, soil, light, new Dictionary<string, string>());
     }
 }

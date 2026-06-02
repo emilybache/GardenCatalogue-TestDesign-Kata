@@ -14,6 +14,7 @@ public class PlantDataParserTests
     [SetUp]
     public void SetUp()
     {
+        BugConfigurations.Reset();
         _dataParser = new PlantDataParser();
     }
 
@@ -87,6 +88,7 @@ public class PlantDataParserTests
         return Verify(result);
     }
     
+
     private static byte[] CreateBinaryData(IEnumerable<Plant> plants, int version = 2)
     {
         using var stream = new MemoryStream();
