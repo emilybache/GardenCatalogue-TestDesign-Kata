@@ -21,7 +21,7 @@ public class PlantDataParserTests
     }
 
     [Test]
-    public Task Parse_EmptyStream_ReturnsEmptyList()
+    public Task EmptyStream_EmptyList()
     {
         using var stream = new MemoryStream();
         var result = _dataParser.Parse(stream);
@@ -29,7 +29,7 @@ public class PlantDataParserTests
     }
 
     [Test]
-    public Task Parse_SingleV1Plant_ReturnsCorrectData()
+    public Task V1_SinglePlant_ValidResult()
     {
         var plants = new List<Plant>
         {
@@ -45,7 +45,7 @@ public class PlantDataParserTests
     }
 
     [Test]
-    public Task Parse_ValidV1BinaryData_ReturnsPlants()
+    public Task V1_TwoPlants_ValidResult()
     {
         var plants = new List<Plant>
         {
@@ -62,7 +62,7 @@ public class PlantDataParserTests
     }
 
     [Test]
-    public Task Parse_V2ExtendedData_ReturnsPlantsWithAllFields()
+    public Task V2_TwoPlants_ValidResult()
     {
         var plants = new List<Plant>
         {
@@ -79,6 +79,34 @@ public class PlantDataParserTests
                 .Build(),
              new PlantBuilder()
                 .WithName("Minimal Plant")
+                .Build()
+        };
+
+        byte[] binaryData = CreateBinaryData(plants, version: 2);
+        using var stream = new MemoryStream(binaryData);
+
+        var result = _dataParser.Parse(stream).ToList();
+        
+        return Verify(PrintScenario(plants, 2, result));
+    }
+
+    [Test]
+    public Task V2_SinglePlant_ValidResult()
+    {
+        var plants = new List<Plant>
+        {
+            new PlantBuilder()
+                .WithName("Red Rose")
+                .WithLatinName("Rosa rubiginosa")
+                .WithArticleNumber("ROS-001")
+                .WithBloomPeriod(BloomPeriod.FromRange(Month.June, Month.September))
+                .WithMaxHeight(1.5)
+                .WithSoil(SoilCondition.Loamy)
+                .WithLight(LightCondition.FullSun)
+                .WithProperty("Color", "Deep Red")
+                .WithProperty("Fragrance", "Strong")
+                .WithProperty("Thorns", "Yes")
+                .WithProperty("Difficulty", "Medium")
                 .Build()
         };
 

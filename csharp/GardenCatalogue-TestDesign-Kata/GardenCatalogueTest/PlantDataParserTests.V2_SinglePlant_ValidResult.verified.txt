@@ -1,0 +1,31 @@
+﻿=== INPUT DATA ===
+--- Item 1 ---
+Name: Red Rose
+Latin Name: Rosa rubiginosa
+Article #: ROS-001
+Blooms: June, July, August, September
+Max Height: 1.5m
+Soil: Loamy
+Light: FullSun
+Properties:
+  - Color: Deep Red
+  - Fragrance: Strong
+  - Thorns: Yes
+  - Difficulty: Medium
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Red Rose
+Latin Name: Rosa rubiginosa
+Article #: ROS-001
+Blooms: June, July, August, September
+Max Height: 1.5m
+Soil: Loamy
+Light: FullSun
+Properties:
+  - Color: Deep Red
+  - Fragrance: Strong
+  - Thorns: Yes
+  - Difficulty: Medium
