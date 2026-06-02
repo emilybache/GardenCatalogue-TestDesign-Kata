@@ -12,6 +12,7 @@ public class PlantDataParserTests
     [SetUp]
     public void SetUp()
     {
+        BugConfigurations.Reset();
         _dataParser = new PlantDataParser();
     }
 
