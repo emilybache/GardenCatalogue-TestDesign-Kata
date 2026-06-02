@@ -25,7 +25,7 @@ public class PlantDataParserTests
     {
         using var stream = new MemoryStream();
         var result = _dataParser.Parse(stream);
-        return Verify(ToApprovedString("Empty Stream", 2, result));
+        return Verify(PrintScenario("Empty Stream", 2, result));
     }
 
     [Test]
@@ -41,7 +41,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(ToApprovedString(plants, 2, result));
+        return Verify(PrintScenario(plants, 2, result));
     }
 
     [Test]
@@ -58,7 +58,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(ToApprovedString(plants, 2, result));
+        return Verify(PrintScenario(plants, 2, result));
     }
 
     [Test]
@@ -87,10 +87,10 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(ToApprovedString(plants, 2, result));
+        return Verify(PrintScenario(plants, 2, result));
     }
 
-    private string ToApprovedString(object input, int version, IEnumerable<Plant> result)
+    private string PrintScenario(object input, int version, IEnumerable<Plant> result)
     {
         var sb = new StringBuilder();
         sb.AppendLine("=== INPUT DATA ===");

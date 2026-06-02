@@ -1,5 +1,7 @@
+using System.Text;
 using GardenCatalogue;
 using VerifyNUnit;
+using static VerifyNUnit.Verifier;
 
 namespace GardenCatalogueTest;
 
@@ -7,48 +9,63 @@ namespace GardenCatalogueTest;
 public class GardenCatalogueManagerApprovalTests
 {
     private GardenCatalogueManager _manager;
+    private PlantPrinter _plantPrinter;
 
     [SetUp]
     public void Setup()
     {
         _manager = new GardenCatalogueManager(TestData.DefaultPlants);
+        _plantPrinter = new PlantPrinter();
     }
 
     [Test]
-    public async Task HedgePlanning()
+    public Task HedgePlanning()
     {
         var minHeight = 2.0;
         var hedge = _manager.PlanHedge(minHeight);
-        await Verifier.Verify(new
-        {
-            MinHeight = minHeight,
-            Result = hedge
-        });
+        return Verify(PrintScenario(new { MinHeight = minHeight }, hedge));
     }
 
     [Test]
-    public async Task ConditionFiltering()
+    public Task ConditionFiltering()
     {
         var soil = SoilCondition.Sandy;
         var light = LightCondition.FullSun;
         var plants = _manager.GetPlantsForCondition(soil, light);
-        await Verifier.Verify(new
-        {
-            Result = plants
-        });
+        return Verify(PrintScenario(new { Soil = soil, Light = light }, plants));
     }
 
     [Test]
-    public async Task BedPlanning()
+    public Task BedPlanning()
     {
         var month = Month.June;
         var maxHeight = 2.0;
         var bedInJune = _manager.PlanBed(month, maxHeight);
-        await Verifier.Verify(new
+        return Verify(PrintScenario(new { Month = month, MaxHeight = maxHeight }, bedInJune));
+    }
+
+    private string PrintScenario(object input, IEnumerable<Plant> result)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("=== INPUT ===");
+        sb.AppendLine(input.ToString());
+        sb.AppendLine();
+
+        var resultList = result.ToList();
+        sb.AppendLine("=== RESULT PLANTS ===");
+        if (!resultList.Any())
         {
-            Month = month,
-            MaxHeight = maxHeight,
-            Result = bedInJune
-        });
+            sb.AppendLine("(None)");
+        }
+        else
+        {
+            for (int i = 0; i < resultList.Count; i++)
+            {
+                sb.AppendLine($"--- Plant {i + 1} ---");
+                _plantPrinter.Print(sb, resultList[i]);
+            }
+        }
+
+        return sb.ToString();
     }
 }
