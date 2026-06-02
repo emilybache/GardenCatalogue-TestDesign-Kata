@@ -1,0 +1,29 @@
+﻿[
+  {
+    Name: Flower1,
+    LatinName: ,
+    ArticleNumber: ,
+    BloomPeriod: {
+      Months: [
+        May,
+        June,
+        July
+      ]
+    },
+    MaxHeight: 0.5
+  },
+  {
+    Name: Bush1,
+    LatinName: ,
+    ArticleNumber: ,
+    Type: Bush,
+    BloomPeriod: {
+      Months: [
+        August
+      ]
+    },
+    MaxHeight: 2.0,
+    Soil: Clay,
+    Light: PartialShade
+  }
+]

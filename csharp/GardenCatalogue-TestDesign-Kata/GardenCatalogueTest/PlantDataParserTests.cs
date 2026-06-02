@@ -1,6 +1,8 @@
 using System.Text;
 using GardenCatalogue;
 using NUnit.Framework;
+using VerifyNUnit;
+using static VerifyNUnit.Verifier;
 
 namespace GardenCatalogueTest;
 
@@ -16,15 +18,15 @@ public class PlantDataParserTests
     }
 
     [Test]
-    public void Parse_EmptyStream_ReturnsEmptyList()
+    public Task Parse_EmptyStream_ReturnsEmptyList()
     {
         using var stream = new MemoryStream();
         var result = _dataParser.Parse(stream);
-        Assert.That(result, Is.Empty);
+        return Verify(result);
     }
 
     [Test]
-    public void Parse_SingleV1Plant_ReturnsCorrectData()
+    public Task Parse_SingleV1Plant_ReturnsCorrectData()
     {
         var plants = new List<Plant>
         {
@@ -36,13 +38,11 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        Assert.That(result.Count, Is.EqualTo(1));
-        Assert.That(result[0].Name, Is.EqualTo("Test Bush"));
-        Assert.That(result[0].Type, Is.EqualTo(PlantType.Bush));
+        return Verify(result);
     }
 
     [Test]
-    public void Parse_ValidV1BinaryData_ReturnsPlants()
+    public Task Parse_ValidV1BinaryData_ReturnsPlants()
     {
         var plants = new List<Plant>
         {
@@ -51,29 +51,15 @@ public class PlantDataParserTests
         };
 
         byte[] binaryData = CreateBinaryData(plants, version: 1);
-        Console.WriteLine($"[DEBUG_LOG] Binary Data Length: {binaryData.Length}");
         using var stream = new MemoryStream(binaryData);
 
         var result = _dataParser.Parse(stream).ToList();
 
-        Assert.That(result.Count, Is.EqualTo(2));
-        Assert.That(result[0].Name, Is.EqualTo("Flower1"));
-        Assert.That(result[0].Type, Is.EqualTo(PlantType.Flower), "First plant type should be Flower");
-        Assert.That(result[0].MaxHeight, Is.EqualTo(0.5));
-        Assert.That(result[0].Soil, Is.EqualTo(SoilCondition.Sandy));
-        Assert.That(result[0].Light, Is.EqualTo(LightCondition.FullSun));
-        Assert.That(result[0].BloomPeriod.Months, Is.EquivalentTo(new[] { Month.May, Month.June, Month.July }));
-        
-        Assert.That(result[1].Name, Is.EqualTo("Bush1"), "Second plant name mismatch");
-        Assert.That(result[1].Type, Is.EqualTo(PlantType.Bush), "Second plant type should be Bush");
-        Assert.That(result[1].MaxHeight, Is.EqualTo(2.0));
-        Assert.That(result[1].Soil, Is.EqualTo(SoilCondition.Clay));
-        Assert.That(result[1].Light, Is.EqualTo(LightCondition.PartialShade));
-        Assert.That(result[1].BloomPeriod.Months, Is.EquivalentTo(new[] { Month.August }));
+        return Verify(result);
     }
 
     [Test]
-    public void Parse_V2ExtendedData_ReturnsPlantsWithAllFields()
+    public Task Parse_V2ExtendedData_ReturnsPlantsWithAllFields()
     {
         var plants = new List<Plant>
         {
@@ -98,19 +84,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        Assert.That(result.Count, Is.EqualTo(2));
-        var plant = result[0];
-        Assert.That(plant.Name, Is.EqualTo("Lavender"));
-        Assert.That(plant.LatinName, Is.EqualTo("Lavandula angustifolia"));
-        Assert.That(plant.ArticleNumber, Is.EqualTo("FLO-001"));
-        Assert.That(plant.Properties["Color"], Is.EqualTo("Purple"));
-        Assert.That(plant.Properties["Fragrance"], Is.EqualTo("High"));
-
-        var minimal = result[1];
-        Assert.That(minimal.Name, Is.EqualTo("Minimal Plant"));
-        Assert.That(minimal.LatinName, Is.Empty);
-        Assert.That(minimal.ArticleNumber, Is.Empty);
-        Assert.That(minimal.Properties, Is.Empty);
+        return Verify(result);
     }
     
     private static byte[] CreateBinaryData(IEnumerable<Plant> plants, int version = 2)

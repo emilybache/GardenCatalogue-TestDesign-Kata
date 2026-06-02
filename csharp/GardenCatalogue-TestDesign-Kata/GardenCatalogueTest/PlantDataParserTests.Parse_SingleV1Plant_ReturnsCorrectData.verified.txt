@@ -1,0 +1,11 @@
+﻿[
+  {
+    Name: Test Bush,
+    LatinName: ,
+    ArticleNumber: ,
+    Type: Bush,
+    BloomPeriod: {},
+    MaxHeight: 1.0,
+    Soil: Any
+  }
+]
