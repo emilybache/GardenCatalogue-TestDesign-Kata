@@ -137,12 +137,12 @@ public class PlantDataParser
         }
 
         return new Plant(
-            name, 
-            string.Empty, 
-            string.Empty, 
-            type, 
-            new BloomPeriod(months.ToArray()), 
-            maxHeight, 
+            name,
+            string.Empty,
+            string.Empty,
+            type,
+            new BloomPeriod(months.ToArray()),
+            maxHeight,
             soil,
             light,
             new Dictionary<string, string>());
