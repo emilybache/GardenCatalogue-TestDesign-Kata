@@ -1,5 +1,6 @@
 package org.sammancoaching;
 
+import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
@@ -8,81 +9,139 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Collectors;
 
 public class PlantDataParserTests {
     private PlantDataParser dataParser;
+    private PlantPrinter plantPrinter;
 
     @BeforeEach
     public void setup() {
         BugConfigurations.reset();
+        //BugConfigurations.bug5 = true;
         dataParser = new PlantDataParser();
+        plantPrinter = new PlantPrinter();
     }
 
     @Test
-    public void testEmptyStreamEmptyList() throws IOException {
+    public void EmptyStream_EmptyList() throws IOException {
         ByteArrayInputStream stream = new ByteArrayInputStream(new byte[0]);
+
         List<Plant> result = dataParser.parse(stream);
-        assertTrue(result.isEmpty());
+
+        Approvals.verify(printScenario("Empty Stream", new byte[0], 2, result));
     }
 
     @Test
-    public void testV1SinglePlantValidResult() throws IOException {
-        Plant plant = new Plant("Test Bush", "", "", PlantType.Bush, new BloomPeriod(List.of()), 0.0, SoilCondition.Any, LightCondition.FullSun, new HashMap<>());
-        byte[] binaryData = createBinaryData(List.of(plant), 1);
+    public void V1_SinglePlant_ValidResult() throws IOException {
+        List<Plant> plants = List.of(
+                new PlantBuilder().withName("Test Bush").withType(PlantType.Bush).build()
+        );
+        byte[] binaryData = createBinaryData(plants, 1);
+
         List<Plant> result = dataParser.parse(new ByteArrayInputStream(binaryData));
 
-        assertEquals(1, result.size());
-        assertEquals("Test Bush", result.get(0).name());
-        assertEquals(PlantType.Bush, result.get(0).type());
+        Approvals.verify(printScenario(plants, binaryData, 2, result));
     }
 
     @Test
-    public void testV1TwoPlantsValidResult() throws IOException {
-        Plant p1 = new Plant("Flower1", "", "", PlantType.Flower, BloomPeriod.fromRange(Month.May, Month.July), 0.5, SoilCondition.Sandy, LightCondition.FullSun, new HashMap<>());
-        Plant p2 = new Plant("Bush1", "", "", PlantType.Bush, new BloomPeriod(List.of(Month.August)), 2.0, SoilCondition.Clay, LightCondition.PartialShade, new HashMap<>());
-        
-        byte[] binaryData = createBinaryData(List.of(p1, p2), 1);
+    public void V1_TwoPlants_ValidResult() throws IOException {
+        List<Plant> plants = List.of(
+                new PlantBuilder().withName("Flower1").withBloomPeriod(BloomPeriod.fromRange(Month.May, Month.July)).withMaxHeight(0.5).withSoil(SoilCondition.Sandy).withLight(LightCondition.FullSun).build(),
+                new PlantBuilder().withName("Bush1").withType(PlantType.Bush).withBloomPeriod(new BloomPeriod(List.of(Month.August))).withMaxHeight(2.0).withSoil(SoilCondition.Clay).withLight(LightCondition.PartialShade).build()
+        );
+        byte[] binaryData = createBinaryData(plants, 1);
+
         List<Plant> result = dataParser.parse(new ByteArrayInputStream(binaryData));
 
-        assertEquals(2, result.size());
-        assertEquals("Flower1", result.get(0).name());
-        assertEquals(PlantType.Flower, result.get(0).type());
-        assertEquals(0.5, result.get(0).maxHeight());
-        assertEquals(SoilCondition.Sandy, result.get(0).soil());
-        assertEquals(LightCondition.FullSun, result.get(0).light());
-        assertEquals(List.of(Month.May, Month.June, Month.July), result.get(0).bloomPeriod().months());
-
-        assertEquals("Bush1", result.get(1).name());
-        assertEquals(PlantType.Bush, result.get(1).type());
-        assertEquals(2.0, result.get(1).maxHeight());
-        assertEquals(SoilCondition.Clay, result.get(1).soil());
-        assertEquals(LightCondition.PartialShade, result.get(1).light());
-        assertEquals(List.of(Month.August), result.get(1).bloomPeriod().months());
+        Approvals.verify(printScenario(plants, binaryData, 2, result));
     }
 
     @Test
-    public void testV2TwoPlantsValidResult() throws IOException {
-        Plant p1 = new Plant("Lavender", "Lavandula angustifolia", "FLO-001", PlantType.Flower, BloomPeriod.fromRange(Month.June, Month.August), 0.6, SoilCondition.Sandy, LightCondition.FullSun, Map.of("Color", "Purple", "Fragrance", "High"));
-        Plant p2 = new Plant("Minimal Plant", "", "", PlantType.Flower, new BloomPeriod(List.of()), 0.0, SoilCondition.Any, LightCondition.FullSun, Map.of());
+    public void V2_TwoPlants_ValidResult() throws IOException {
+        List<Plant> plants = List.of(
+                new PlantBuilder()
+                        .withName("Lavender")
+                        .withLatinName("Lavandula angustifolia")
+                        .withArticleNumber("FLO-001")
+                        .withBloomPeriod(BloomPeriod.fromRange(Month.June, Month.August))
+                        .withMaxHeight(0.6)
+                        .withSoil(SoilCondition.Sandy)
+                        .withLight(LightCondition.FullSun)
+                        .withProperty("Color", "Purple")
+                        .withProperty("Fragrance", "High")
+                        .build(),
+                new PlantBuilder()
+                        .withName("Minimal Plant")
+                        .build()
+        );
+        byte[] binaryData = createBinaryData(plants, 2);
 
-        byte[] binaryData = createBinaryData(List.of(p1, p2), 2);
         List<Plant> result = dataParser.parse(new ByteArrayInputStream(binaryData));
 
-        assertEquals(2, result.size());
-        assertEquals("Lavender", result.get(0).name());
-        assertEquals("Lavandula angustifolia", result.get(0).latinName());
-        assertEquals("FLO-001", result.get(0).articleNumber());
-        assertEquals("Purple", result.get(0).properties().get("Color"));
-        assertEquals("High", result.get(0).properties().get("Fragrance"));
+        Approvals.verify(printScenario(plants, binaryData, 2, result));
+    }
 
-        assertEquals("Minimal Plant", result.get(1).name());
-        assertEquals("", result.get(1).latinName());
-        assertEquals("", result.get(1).articleNumber());
-        assertTrue(result.get(1).properties().isEmpty());
+    @Test
+    public void V2_SinglePlant_ValidResult() throws IOException {
+        List<Plant> plants = List.of(
+                new PlantBuilder()
+                        .withName("Red Rose")
+                        .withLatinName("Rosa rubiginosa")
+                        .withArticleNumber("ROS-001")
+                        .withBloomPeriod(BloomPeriod.fromRange(Month.June, Month.September))
+                        .withMaxHeight(1.5)
+                        .withSoil(SoilCondition.Loamy)
+                        .withLight(LightCondition.FullSun)
+                        .withProperty("Color", "Deep Red")
+                        .withProperty("Fragrance", "Strong")
+                        .withProperty("Thorns", "Yes")
+                        .withProperty("Difficulty", "Medium")
+                        .build()
+        );
+        byte[] binaryData = createBinaryData(plants, 2);
+
+        List<Plant> result = dataParser.parse(new ByteArrayInputStream(binaryData));
+
+        Approvals.verify(printScenario(plants, binaryData, 2, result));
+    }
+
+    private String printScenario(Object input, byte[] binaryData, int version, List<Plant> result) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== INPUT DATA ===\n");
+        if (input instanceof String) {
+            sb.append(input).append("\n");
+        } else if (input instanceof List) {
+            List<Plant> plants = (List<Plant>) input;
+            for (int i = 0; i < plants.size(); i++) {
+                sb.append(String.format("--- Item %d ---\n", i + 1));
+                plantPrinter.print(sb, plants.get(i));
+            }
+        }
+
+        if (binaryData.length > 0) {
+            sb.append("\n");
+            sb.append(String.format("Binary: %s\n", HexFormat.of().withUpperCase().formatHex(binaryData)));
+        }
+
+        sb.append("\n");
+        sb.append(String.format("--- Parser Version %d ---\n", version));
+        sb.append("\n");
+
+        sb.append("=== OUTPUT PLANTS ===\n");
+        if (result.isEmpty()) {
+            sb.append("(None)\n");
+        } else {
+            for (int i = 0; i < result.size(); i++) {
+                sb.append(String.format("--- Plant %d ---\n", i + 1));
+                plantPrinter.print(sb, result.get(i));
+            }
+        }
+
+        return sb.toString();
     }
 
     private byte[] createBinaryData(List<Plant> plants, int version) throws IOException {
@@ -113,12 +172,16 @@ public class PlantDataParserTests {
             if (version == 2) {
                 writeString(out, plant.latinName());
                 writeString(out, plant.articleNumber());
-                
+
                 ByteBuffer propCountBuf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
                 propCountBuf.putInt(plant.properties().size());
                 out.write(propCountBuf.array());
 
-                for (Map.Entry<String, String> entry : plant.properties().entrySet()) {
+                List<Map.Entry<String, String>> sortedEntries = plant.properties().entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .toList();
+
+                for (Map.Entry<String, String> entry : sortedEntries) {
                     writeString(out, entry.getKey());
                     writeString(out, entry.getValue());
                 }

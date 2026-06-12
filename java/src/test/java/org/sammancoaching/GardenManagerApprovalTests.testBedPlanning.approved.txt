@@ -1,1 +1,0 @@
-[0] = Plant{name='Lavender', latinName='Lavandula angustifolia', articleNumber='FLO-001', type=Flower, maxHeight=0.6, soil=Sandy, light=FullSun}

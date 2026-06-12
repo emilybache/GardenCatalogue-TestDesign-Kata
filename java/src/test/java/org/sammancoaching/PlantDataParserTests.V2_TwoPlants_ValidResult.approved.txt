@@ -1,0 +1,39 @@
+=== INPUT DATA ===
+--- Item 1 ---
+Name: Lavender
+Latin Name: Lavandula angustifolia
+Article #: FLO-001
+Blooms: June, July, August
+Max Height: 0.6m
+Soil: Sandy
+Light: FullSun
+Properties:
+  - Color: Purple
+  - Fragrance: High
+--- Item 2 ---
+Name: Minimal Plant
+Max Height: 1.0m
+Soil: Any
+Light: FullSun
+
+Binary: 504C4E544C6176656E64657200000000000000000000000000000000000000000000000000000000333333333333E33F0000000000000000E0000000164C6176616E64756C6120616E6775737469666F6C696107464C4F2D3030310200000005436F6C6F7206507572706C65094672616772616E636504486967684D696E696D616C20506C616E740000000000000000000000000000000000000000000000000000000000F03F030000000000000000000000000000000000
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Lavender
+Latin Name: Lavandula angustifolia
+Article #: FLO-001
+Blooms: June, July, August
+Max Height: 0.6m
+Soil: Sandy
+Light: FullSun
+Properties:
+  - Color: Purple
+  - Fragrance: High
+--- Plant 2 ---
+Name: Minimal Plant
+Max Height: 1.0m
+Soil: Any
+Light: FullSun
