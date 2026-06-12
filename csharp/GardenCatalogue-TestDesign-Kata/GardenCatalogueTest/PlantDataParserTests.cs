@@ -16,6 +16,7 @@ public class PlantDataParserTests
     public void SetUp()
     {
         BugConfigurations.Reset();
+        BugConfigurations.Bug5 = true;
         _dataParser = new PlantDataParser();
         _plantPrinter = new PlantPrinter();
     }
@@ -25,7 +26,7 @@ public class PlantDataParserTests
     {
         using var stream = new MemoryStream();
         var result = _dataParser.Parse(stream);
-        return Verify(PrintScenario("Empty Stream", 2, result));
+        return Verify(PrintScenario("Empty Stream", Array.Empty<byte>(), 2, result));
     }
 
     [Test]
@@ -41,7 +42,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(PrintScenario(plants, 2, result));
+        return Verify(PrintScenario(plants, binaryData, 2, result));
     }
 
     [Test]
@@ -58,7 +59,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(PrintScenario(plants, 2, result));
+        return Verify(PrintScenario(plants, binaryData, 2, result));
     }
 
     [Test]
@@ -87,7 +88,7 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
         
-        return Verify(PrintScenario(plants, 2, result));
+        return Verify(PrintScenario(plants, binaryData, 2, result));
     }
 
     [Test]
@@ -115,10 +116,10 @@ public class PlantDataParserTests
 
         var result = _dataParser.Parse(stream).ToList();
 
-        return Verify(PrintScenario(plants, 2, result));
+        return Verify(PrintScenario(plants, binaryData, 2, result));
     }
 
-    private string PrintScenario(object input, int version, IEnumerable<Plant> result)
+    private string PrintScenario(object input, byte[] binaryData, int version, IEnumerable<Plant> result)
     {
         var sb = new StringBuilder();
         sb.AppendLine("=== INPUT DATA ===");
@@ -134,6 +135,12 @@ public class PlantDataParserTests
                 sb.AppendLine($"--- Item {i + 1} ---");
                 _plantPrinter.Print(sb, list[i]);
             }
+        }
+
+        if (binaryData.Length > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine($"Binary: {Convert.ToHexString(binaryData)}");
         }
 
         sb.AppendLine();
