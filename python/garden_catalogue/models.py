@@ -42,21 +42,21 @@ class Season(Enum):
 class BloomPeriod:
     months: List[Month] = field(default_factory=list)
 
-    @staticmethod
-    def from_season(season: Season) -> 'BloomPeriod':
+    @classmethod
+    def from_season(cls, season: Season) -> 'BloomPeriod':
         if season == Season.Spring:
-            return BloomPeriod([Month.March, Month.April, Month.May])
+            return cls([Month.March, Month.April, Month.May])
         elif season == Season.Summer:
-            return BloomPeriod([Month.June, Month.July, Month.August])
+            return cls([Month.June, Month.July, Month.August])
         elif season == Season.Autumn:
-            return BloomPeriod([Month.September, Month.October, Month.November])
+            return cls([Month.September, Month.October, Month.November])
         elif season == Season.Winter:
-            return BloomPeriod([Month.December, Month.January, Month.February])
+            return cls([Month.December, Month.January, Month.February])
         else:
             raise ValueError(f"Unknown season: {season}")
 
-    @staticmethod
-    def from_range(start: Month, end: Month) -> 'BloomPeriod':
+    @classmethod
+    def from_range(cls, start: Month, end: Month) -> 'BloomPeriod':
         months = []
         s = int(start)
         e = int(end)
@@ -69,10 +69,16 @@ class BloomPeriod:
                 months.append(Month(i))
             for i in range(1, e + 1):
                 months.append(Month(i))
-        return BloomPeriod(months)
+        return cls(months)
 
     def blooms_in(self, month: Month) -> bool:
         return month in self.months
+
+    def __contains__(self, month: Month) -> bool:
+        return month in self.months
+
+    def __repr__(self) -> str:
+        return f"BloomPeriod(months={self.months})"
 
 @dataclass(frozen=True)
 class Plant:
@@ -85,3 +91,31 @@ class Plant:
     latin_name: str = ""
     article_number: str = ""
     properties: Dict[str, str] = field(default_factory=dict)
+
+    def __repr__(self) -> str:
+        return f"Plant(name='{self.name}', type={self.type}, ...)"
+
+
+def create_plant(
+    name: str = "Unknown",
+    latin_name: str = "",
+    article_number: str = "",
+    plant_type: PlantType = PlantType.Flower,
+    bloom_period: Optional[BloomPeriod] = None,
+    max_height: float = 0.0,
+    soil: SoilCondition = SoilCondition.Any,
+    light: LightCondition = LightCondition.FullSun,
+    properties: Optional[Dict[str, str]] = None
+) -> Plant:
+    """Helper to create a Plant with defaults, replacing the C#-style Builder."""
+    return Plant(
+        name=name,
+        latin_name=latin_name,
+        article_number=article_number,
+        type=plant_type,
+        bloom_period=bloom_period or BloomPeriod([]),
+        max_height=max_height,
+        soil=soil,
+        light=light,
+        properties=properties or {}
+    )

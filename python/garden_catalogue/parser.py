@@ -14,14 +14,14 @@ class PlantDataParser:
         stream.seek(0)
         
         if length == 0:
-            return []
+            return
 
         version = self._detect_version(stream, length)
 
         if version == 2:
-            return self._parse_v2(stream, length)
+            yield from self._parse_v2(stream, length)
         else:
-            return self._parse_v1(stream, length)
+            yield from self._parse_v1(stream, length)
 
     def _detect_version(self, stream: io.BufferedIOBase, length: int) -> int:
         if length < 4:
@@ -38,17 +38,13 @@ class PlantDataParser:
         stream.seek(original_position)
         return 1
 
-    def _parse_v1(self, stream: io.BufferedIOBase, length: int) -> List[Plant]:
-        plants = []
+    def _parse_v1(self, stream: io.BufferedIOBase, length: int) -> Iterable[Plant]:
         while stream.tell() < length:
             if stream.tell() + 56 > length:
                 break
-            plant = self._read_common_header(stream)
-            plants.Add(plant) if hasattr(plants, 'Add') else plants.append(plant) # Just being safe, .append is correct
-        return plants
+            yield self._read_common_header(stream)
 
-    def _parse_v2(self, stream: io.BufferedIOBase, length: int) -> List[Plant]:
-        plants = []
+    def _parse_v2(self, stream: io.BufferedIOBase, length: int) -> Iterable[Plant]:
         while stream.tell() < length:
             if stream.tell() + 56 > length:
                 break
@@ -63,14 +59,14 @@ class PlantDataParser:
             if not BugConfigurations.bug4:
                 prop_count_bytes = stream.read(4)
                 if len(prop_count_bytes) == 4:
-                    prop_count = struct.unpack('<i', prop_count_bytes)[0]
+                    prop_count, = struct.unpack('<i', prop_count_bytes)
                     for _ in range(prop_count):
                         key = self._read_string(stream)
                         value = self._read_string(stream)
                         properties[key] = value
 
             if BugConfigurations.bug5:
-                plants.append(Plant(
+                yield Plant(
                     name=header_plant.name,
                     article_number=latin_name, # SWAPPED BUG
                     latin_name=article_number, # SWAPPED BUG
@@ -80,9 +76,9 @@ class PlantDataParser:
                     soil=header_plant.soil,
                     light=header_plant.light,
                     properties=properties
-                ))
+                )
             else:
-                plants.append(Plant(
+                yield Plant(
                     name=header_plant.name,
                     latin_name=latin_name,
                     article_number=article_number,
@@ -92,8 +88,7 @@ class PlantDataParser:
                     soil=header_plant.soil,
                     light=header_plant.light,
                     properties=properties
-                ))
-        return plants
+                )
 
     def _read_common_header(self, stream: io.BufferedIOBase) -> Plant:
         header_bytes = stream.read(56)
@@ -105,11 +100,7 @@ class PlantDataParser:
         else:
             name = name.strip(self.TRIM_CHARS)
 
-        plant_type_val = struct.unpack('<i', header_bytes[32:36])[0]
-        max_height = struct.unpack('<d', header_bytes[36:44])[0]
-        soil_val = struct.unpack('<i', header_bytes[44:48])[0]
-        light_val = struct.unpack('<i', header_bytes[48:52])[0]
-        bloom_mask = struct.unpack('<i', header_bytes[52:56])[0]
+        plant_type_val, max_height, soil_val, light_val, bloom_mask = struct.unpack('<idiii', header_bytes[32:56])
 
         months = []
         for i in range(12):

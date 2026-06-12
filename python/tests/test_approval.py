@@ -1,9 +1,9 @@
 import pytest
 from approvaltests import verify
 from garden_catalogue.manager import GardenCatalogueManager
-from garden_catalogue.helpers import PlantPrinter
 from garden_catalogue.models import SoilCondition, LightCondition, Month
 from .test_data import TestData
+from .plant_printer import PlantPrinter
 
 class TestGardenCatalogueManagerApproval:
     @pytest.fixture(autouse=True)

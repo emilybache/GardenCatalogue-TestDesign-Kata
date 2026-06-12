@@ -3,9 +3,9 @@ import io
 import struct
 from approvaltests import verify
 from garden_catalogue.parser import PlantDataParser
-from garden_catalogue.helpers import PlantPrinter, PlantBuilder
-from garden_catalogue.models import Plant, PlantType, BloomPeriod, Month, SoilCondition, LightCondition
+from garden_catalogue.models import Plant, PlantType, BloomPeriod, Month, SoilCondition, LightCondition, create_plant
 from garden_catalogue.bug_configurations import BugConfigurations
+from .plant_printer import PlantPrinter
 
 class TestPlantDataParser:
     @pytest.fixture(autouse=True)
@@ -21,7 +21,7 @@ class TestPlantDataParser:
 
     def test_v1_single_plant_valid_result(self):
         plants = [
-            PlantBuilder().with_name("Test Bush").with_type(PlantType.Bush).build()
+            create_plant(name="Test Bush", plant_type=PlantType.Bush)
         ]
         binary_data = self._create_binary_data(plants, version=1)
         stream = io.BytesIO(binary_data)
@@ -30,8 +30,8 @@ class TestPlantDataParser:
 
     def test_v1_two_plants_valid_result(self):
         plants = [
-            PlantBuilder().with_name("Flower1").with_bloom_period(BloomPeriod.from_range(Month.May, Month.July)).with_max_height(0.5).with_soil(SoilCondition.Sandy).with_light(LightCondition.FullSun).build(),
-            PlantBuilder().with_name("Bush1").with_type(PlantType.Bush).with_bloom_period(BloomPeriod([Month.August])).with_max_height(2.0).with_soil(SoilCondition.Clay).with_light(LightCondition.PartialShade).build()
+            create_plant(name="Flower1", bloom_period=BloomPeriod.from_range(Month.May, Month.July), max_height=0.5, soil=SoilCondition.Sandy, light=LightCondition.FullSun),
+            create_plant(name="Bush1", plant_type=PlantType.Bush, bloom_period=BloomPeriod([Month.August]), max_height=2.0, soil=SoilCondition.Clay, light=LightCondition.PartialShade)
         ]
         binary_data = self._create_binary_data(plants, version=1)
         stream = io.BytesIO(binary_data)
@@ -40,20 +40,17 @@ class TestPlantDataParser:
 
     def test_v2_two_plants_valid_result(self):
         plants = [
-            PlantBuilder()
-                .with_name("Lavender")
-                .with_latin_name("Lavandula angustifolia")
-                .with_article_number("FLO-001")
-                .with_bloom_period(BloomPeriod.from_range(Month.June, Month.August))
-                .with_max_height(0.6)
-                .with_soil(SoilCondition.Sandy)
-                .with_light(LightCondition.FullSun)
-                .with_property("Color", "Purple")
-                .with_property("Fragrance", "High")
-                .build(),
-             PlantBuilder()
-                .with_name("Minimal Plant")
-                .build()
+            create_plant(
+                name="Lavender",
+                latin_name="Lavandula angustifolia",
+                article_number="FLO-001",
+                bloom_period=BloomPeriod.from_range(Month.June, Month.August),
+                max_height=0.6,
+                soil=SoilCondition.Sandy,
+                light=LightCondition.FullSun,
+                properties={"Color": "Purple", "Fragrance": "High"}
+            ),
+             create_plant(name="Minimal Plant")
         ]
         binary_data = self._create_binary_data(plants, version=2)
         stream = io.BytesIO(binary_data)
@@ -62,19 +59,21 @@ class TestPlantDataParser:
 
     def test_v2_single_plant_valid_result(self):
         plants = [
-            PlantBuilder()
-                .with_name("Red Rose")
-                .with_latin_name("Rosa rubiginosa")
-                .with_article_number("ROS-001")
-                .with_bloom_period(BloomPeriod.from_range(Month.June, Month.September))
-                .with_max_height(1.5)
-                .with_soil(SoilCondition.Loamy)
-                .with_light(LightCondition.FullSun)
-                .with_property("Color", "Deep Red")
-                .with_property("Fragrance", "Strong")
-                .with_property("Thorns", "Yes")
-                .with_property("Difficulty", "Medium")
-                .build()
+            create_plant(
+                name="Red Rose",
+                latin_name="Rosa rubiginosa",
+                article_number="ROS-001",
+                bloom_period=BloomPeriod.from_range(Month.June, Month.September),
+                max_height=1.5,
+                soil=SoilCondition.Loamy,
+                light=LightCondition.FullSun,
+                properties={
+                    "Color": "Deep Red",
+                    "Fragrance": "Strong",
+                    "Thorns": "Yes",
+                    "Difficulty": "Medium"
+                }
+            )
         ]
         binary_data = self._create_binary_data(plants, version=2)
         stream = io.BytesIO(binary_data)
