@@ -1,0 +1,33 @@
+=== INPUT DATA ===
+--- Item 1 ---
+Name: Flower1
+Blooms: May, June, July
+Max Height: 0.5m
+Soil: Sandy
+Light: FullSun
+--- Item 2 ---
+Name: Bush1
+Type: Bush
+Blooms: August
+Max Height: 2.0m
+Soil: Clay
+Light: PartialShade
+
+Binary: 466C6F776572310000000000000000000000000000000000000000000000000000000000000000000000E03F0000000000000000700000004275736831000000000000000000000000000000000000000000000000000000010000000000000000000040010000000100000080000000
+
+--- Parser Version 1 ---
+
+=== OUTPUT PLANTS ===
+--- Plant 1 ---
+Name: Flower1
+Blooms: May, June, July
+Max Height: 0.5m
+Soil: Sandy
+Light: FullSun
+--- Plant 2 ---
+Name: Bush1
+Type: Bush
+Blooms: August
+Max Height: 2.0m
+Soil: Clay
+Light: PartialShade
