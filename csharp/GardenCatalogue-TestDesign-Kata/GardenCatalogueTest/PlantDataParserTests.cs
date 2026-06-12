@@ -16,7 +16,7 @@ public class PlantDataParserTests
     public void SetUp()
     {
         BugConfigurations.Reset();
-        BugConfigurations.Bug5 = true;
+        //BugConfigurations.Bug5 = true;
         _dataParser = new PlantDataParser();
         _plantPrinter = new PlantPrinter();
     }

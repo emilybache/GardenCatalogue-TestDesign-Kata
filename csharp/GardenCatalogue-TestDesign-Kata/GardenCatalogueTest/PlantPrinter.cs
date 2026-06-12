@@ -7,20 +7,21 @@ public class PlantPrinter
 {
     public void Print(StringBuilder sb, Plant plant, string indent = "")
     {
+        void AppendIfNotEmpty(string label, string? value)
+        {
+            if (!string.IsNullOrEmpty(value))
+                sb.AppendLine($"{indent}{label}: {value}");
+        }
+
         sb.AppendLine($"{indent}Name: {plant.Name}");
-        if (!string.IsNullOrEmpty(plant.LatinName))
-            sb.AppendLine($"{indent}Latin Name: {plant.LatinName}");
-        if (!string.IsNullOrEmpty(plant.ArticleNumber))
-            sb.AppendLine($"{indent}Article #: {plant.ArticleNumber}");
+        AppendIfNotEmpty("Latin Name", plant.LatinName);
+        AppendIfNotEmpty("Article #", plant.ArticleNumber);
         
         if (plant.Type != PlantType.Flower)
             sb.AppendLine($"{indent}Type: {plant.Type}");
 
         if (plant.BloomPeriod.Months.Any())
-        {
-            var months = string.Join(", ", plant.BloomPeriod.Months);
-            sb.AppendLine($"{indent}Blooms: {months}");
-        }
+            sb.AppendLine($"{indent}Blooms: {string.Join(", ", plant.BloomPeriod.Months)}");
 
         sb.AppendLine($"{indent}Max Height: {plant.MaxHeight.ToString("F1", CultureInfo.InvariantCulture)}m");
         sb.AppendLine($"{indent}Soil: {plant.Soil}");
@@ -29,10 +30,8 @@ public class PlantPrinter
         if (plant.Properties.Any())
         {
             sb.AppendLine($"{indent}Properties:");
-            foreach (var prop in plant.Properties)
-            {
-                sb.AppendLine($"{indent}  - {prop.Key}: {prop.Value}");
-            }
+            foreach (var (key, value) in plant.Properties)
+                sb.AppendLine($"{indent}  - {key}: {value}");
         }
     }
 }
