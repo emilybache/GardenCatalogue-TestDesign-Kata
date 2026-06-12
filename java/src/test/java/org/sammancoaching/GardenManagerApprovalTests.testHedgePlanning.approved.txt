@@ -1,0 +1,4 @@
+[0] = Plant{name='Beech', latinName='Fagus sylvatica', articleNumber='TRE-001', type=Tree, maxHeight=5.0, soil=Any, light=FullSun}
+[1] = Plant{name='Yew', latinName='Taxus baccata', articleNumber='TRE-002', type=Tree, maxHeight=4.0, soil=Any, light=PartialShade}
+[2] = Plant{name='Oak', latinName='Quercus robur', articleNumber='TRE-003', type=Tree, maxHeight=20.0, soil=Any, light=FullSun}
+[3] = Plant{name='Silver Birch', latinName='Betula pendula', articleNumber='TRE-004', type=Tree, maxHeight=15.0, soil=Sandy, light=FullSun}
