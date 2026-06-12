@@ -1,7 +1,7 @@
 Garden Catalogue Test Design Kata
 =================================
 
-For exercise instructions see (top level README)[../README.md]
+For exercise instructions see [top level README](../README.md)
 
 ## Setup
 

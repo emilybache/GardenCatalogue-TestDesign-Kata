@@ -6,7 +6,7 @@
 
 For agents working on this project:
 
-1. Create a virtual environment: `python3 -m venv .venv`
-2. Activate it: `source .venv/bin/activate`
+1. Create a virtual environment
+2. Activate it
 3. Install dependencies: `pip install -e .`
 4. Run tests: `pytest`
