@@ -11,5 +11,5 @@ There are several test design issues you could look at, all of which will make i
 4) There is a rather long scenario in GardenManagementTests that tests several things.
 
 
-Some language versions contain scripts that you can use to insert bugs so you can get some test failures and find out whether your design changes have helped.
+The implementation contains bugs which you can activate to get some test failures and find out whether your design changes have helped.
 
