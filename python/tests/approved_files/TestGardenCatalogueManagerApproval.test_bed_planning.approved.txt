@@ -1,12 +1,18 @@
-=== INPUT ===
-{ Month = June, MaxHeight = 2 }
-
-=== RESULT PLANTS ===
---- Plant 1 ---
-Name: Lavender
-Latin Name: Lavandula angustifolia
-Article #: FLO-001
-Blooms: June, July, August
-Max Height: 0.6m
-Soil: Sandy
-Light: FullSun
+[
+  {
+    "Name": "Lavender",
+    "LatinName": "Lavandula angustifolia",
+    "ArticleNumber": "FLO-001",
+    "Type": "Flower",
+    "BloomPeriod": {
+      "Months": [
+        "June",
+        "July",
+        "August"
+      ]
+    },
+    "MaxHeight": 0.6,
+    "Soil": "Sandy",
+    "Light": "FullSun"
+  }
+]

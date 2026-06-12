@@ -1,23 +1,20 @@
 import pytest
 import io
 import struct
-from approvaltests import verify
 from garden_catalogue.parser import PlantDataParser
 from garden_catalogue.models import Plant, PlantType, BloomPeriod, Month, SoilCondition, LightCondition, create_plant
 from garden_catalogue.bug_configurations import BugConfigurations
-from .plant_printer import PlantPrinter
 
 class TestPlantDataParser:
     @pytest.fixture(autouse=True)
     def setup(self):
         BugConfigurations.reset()
         self.data_parser = PlantDataParser()
-        self.plant_printer = PlantPrinter()
 
     def test_empty_stream_empty_list(self):
         stream = io.BytesIO()
         result = self.data_parser.parse(stream)
-        verify(self._print_scenario("Empty Stream", b"", 2, result))
+        assert list(result) == []
 
     def test_v1_single_plant_valid_result(self):
         plants = [
@@ -25,8 +22,11 @@ class TestPlantDataParser:
         ]
         binary_data = self._create_binary_data(plants, version=1)
         stream = io.BytesIO(binary_data)
-        result = self.data_parser.parse(stream)
-        verify(self._print_scenario(plants, binary_data, 1, result))
+        result = list(self.data_parser.parse(stream))
+        
+        assert len(result) == 1
+        assert result[0].name == "Test Bush"
+        assert result[0].type == PlantType.Bush
 
     def test_v1_two_plants_valid_result(self):
         plants = [
@@ -35,8 +35,22 @@ class TestPlantDataParser:
         ]
         binary_data = self._create_binary_data(plants, version=1)
         stream = io.BytesIO(binary_data)
-        result = self.data_parser.parse(stream)
-        verify(self._print_scenario(plants, binary_data, 1, result))
+        result = list(self.data_parser.parse(stream))
+        
+        assert len(result) == 2
+        assert result[0].name == "Flower1"
+        assert result[0].type == PlantType.Flower
+        assert result[0].max_height == 0.5
+        assert result[0].soil == SoilCondition.Sandy
+        assert result[0].light == LightCondition.FullSun
+        assert result[0].bloom_period.months == [Month.May, Month.June, Month.July]
+
+        assert result[1].name == "Bush1"
+        assert result[1].type == PlantType.Bush
+        assert result[1].max_height == 2.0
+        assert result[1].soil == SoilCondition.Clay
+        assert result[1].light == LightCondition.PartialShade
+        assert result[1].bloom_period.months == [Month.August]
 
     def test_v2_two_plants_valid_result(self):
         plants = [
@@ -54,8 +68,21 @@ class TestPlantDataParser:
         ]
         binary_data = self._create_binary_data(plants, version=2)
         stream = io.BytesIO(binary_data)
-        result = self.data_parser.parse(stream)
-        verify(self._print_scenario(plants, binary_data, 2, result))
+        result = list(self.data_parser.parse(stream))
+        
+        assert len(result) == 2
+        plant = result[0]
+        assert plant.name == "Lavender"
+        assert plant.latin_name == "Lavandula angustifolia"
+        assert plant.article_number == "FLO-001"
+        assert plant.properties["Color"] == "Purple"
+        assert plant.properties["Fragrance"] == "High"
+
+        minimal = result[1]
+        assert minimal.name == "Minimal Plant"
+        assert minimal.latin_name == ""
+        assert minimal.article_number == ""
+        assert minimal.properties == {}
 
     def test_v2_single_plant_valid_result(self):
         plants = [
@@ -77,37 +104,23 @@ class TestPlantDataParser:
         ]
         binary_data = self._create_binary_data(plants, version=2)
         stream = io.BytesIO(binary_data)
-        result = self.data_parser.parse(stream)
-        verify(self._print_scenario(plants, binary_data, 2, result))
-
-    def _print_scenario(self, input_data, binary_data, version, result_plants):
-        lines = ["=== INPUT DATA ==="]
-        if isinstance(input_data, str):
-            lines.append(input_data)
-        else:
-            for i, plant in enumerate(input_data):
-                lines.append(f"--- Item {i + 1} ---")
-                lines.append(self.plant_printer.print(plant).rstrip())
-
-        if binary_data:
-            lines.append("")
-            # In C# it's Convert.ToHexString which doesn't have spaces
-            lines.append(f"Binary: {binary_data.hex().upper()}")
-
-        lines.append("")
-        lines.append(f"--- Parser Version {version} ---")
-        lines.append("")
-
-        lines.append("=== OUTPUT PLANTS ===")
-        plants_list = list(result_plants)
-        if not plants_list:
-            lines.append("(None)")
-        else:
-            for i, plant in enumerate(plants_list):
-                lines.append(f"--- Plant {i + 1} ---")
-                lines.append(self.plant_printer.print(plant).rstrip())
-
-        return "\n".join(lines) + "\n"
+        result = list(self.data_parser.parse(stream))
+        
+        assert len(result) == 1
+        plant = result[0]
+        assert plant.name == "Red Rose"
+        assert plant.latin_name == "Rosa rubiginosa"
+        assert plant.article_number == "ROS-001"
+        assert plant.max_height == 1.5
+        assert plant.soil == SoilCondition.Loamy
+        assert plant.light == LightCondition.FullSun
+        assert plant.bloom_period.months == [Month.June, Month.July, Month.August, Month.September]
+        assert plant.properties == {
+            "Color": "Deep Red",
+            "Fragrance": "Strong",
+            "Thorns": "Yes",
+            "Difficulty": "Medium"
+        }
 
     def _create_binary_data(self, plants, version=2):
         stream = io.BytesIO()

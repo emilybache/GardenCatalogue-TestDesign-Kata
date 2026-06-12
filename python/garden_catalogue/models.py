@@ -80,6 +80,11 @@ class BloomPeriod:
     def __repr__(self) -> str:
         return f"BloomPeriod(months={self.months})"
 
+    def to_dict(self):
+        return {
+            "Months": [m.name for m in self.months]
+        } if self.months else {}
+
 @dataclass(frozen=True)
 class Plant:
     name: str
@@ -90,7 +95,22 @@ class Plant:
     light: LightCondition
     latin_name: str = ""
     article_number: str = ""
-    properties: Dict[str, str] = field(default_factory=dict)
+    properties: Dict[str, str] = field(default_factory=list)
+
+    def to_dict(self):
+        d = {
+            "Name": self.name,
+            "LatinName": self.latin_name,
+            "ArticleNumber": self.article_number,
+            "Type": self.type.name,
+            "BloomPeriod": self.bloom_period.to_dict(),
+            "MaxHeight": self.max_height,
+            "Soil": self.soil.name,
+            "Light": self.light.name,
+        }
+        # Filter out empty or default values if needed to match C# exactly?
+        # Looking at C# verified file, it doesn't always have everything.
+        return d
 
     def __repr__(self) -> str:
         return f"Plant(name='{self.name}', type={self.type}, ...)"
