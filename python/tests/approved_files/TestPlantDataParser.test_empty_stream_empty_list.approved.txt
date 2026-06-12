@@ -1,0 +1,7 @@
+=== INPUT DATA ===
+Empty Stream
+
+--- Parser Version 2 ---
+
+=== OUTPUT PLANTS ===
+(None)

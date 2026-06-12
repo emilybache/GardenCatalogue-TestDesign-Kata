@@ -3,12 +3,27 @@ Garden Catalogue Test Design Kata
 
 For exercise instructions see (top level README)[../README.md]
 
-Suggestion: create a python virtual environment for this project. See the [documentation](https://docs.python.org/3/library/venv.html)
+## Setup
 
-install requirements:
+It is recommended to create a python virtual environment for this project.
 
-    pip install --upgrade .
+### Create and activate virtual environment
 
-run tests:
+On macOS/Linux:
 
-    python -m pytest
+    python3 -m venv .venv
+    source .venv/bin/activate
+
+On Windows:
+
+    python -m venv .venv
+    .venv\Scripts\activate
+
+### Install dependencies
+
+    pip install --upgrade pip
+    pip install -e .
+
+## Run tests
+
+    pytest

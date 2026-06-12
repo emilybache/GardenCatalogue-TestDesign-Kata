@@ -1,0 +1,37 @@
+=== INPUT ===
+{ MinHeight = 2 }
+
+=== RESULT PLANTS ===
+--- Plant 1 ---
+Name: Beech
+Latin Name: Fagus sylvatica
+Article #: TRE-001
+Type: Tree
+Blooms: May
+Max Height: 5.0m
+Soil: Any
+Light: FullSun
+--- Plant 2 ---
+Name: Yew
+Latin Name: Taxus baccata
+Article #: TRE-002
+Type: Tree
+Max Height: 4.0m
+Soil: Any
+Light: PartialShade
+--- Plant 3 ---
+Name: Oak
+Latin Name: Quercus robur
+Article #: TRE-003
+Type: Tree
+Max Height: 20.0m
+Soil: Any
+Light: FullSun
+--- Plant 4 ---
+Name: Silver Birch
+Latin Name: Betula pendula
+Article #: TRE-004
+Type: Tree
+Max Height: 15.0m
+Soil: Sandy
+Light: FullSun
